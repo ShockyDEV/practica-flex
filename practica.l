@@ -1,15 +1,22 @@
 %{
 #include <stdio.h>
-int n_media = 0; 
+
+/* variables globales*/
+
+int n_media = 0;       
+int n_propiedades = 0; 
+int n_reglas = 0;      
 %}
 
 %option noyywrap
 
-/* estado para comentarios */
+/* estado para comentarios*/
 %x COM
 
-%% 
+/* Una propiedad es una palabra (letras y guiones) seguida de ":" */
+propiedad   [a-zA-Z\-]+[ \t]*:
 
+%%
 
 "/*"            { BEGIN(COM); }
 <COM>.|\n       { ; }
@@ -17,11 +24,15 @@ int n_media = 0;
 
 "@media"        { n_media++; }
 
+"{"             { n_reglas++; }
+
+{propiedad}     { n_propiedades++; }
+
 .|\n            { ; }
 
 %%
 
-/* main para pasar el CSS por consola */
+/* main para pasar el CSS por consola y printear resultados por pantalla */
 int main(int argc, char **argv)
 {
     if(argc > 1) {
@@ -30,7 +41,12 @@ int main(int argc, char **argv)
             return (1);
         }
     }
+
     yylex();
+
     printf("- Número de bloques @media: %d\n", n_media);
+    printf("- Número de propiedades: %d\n", n_propiedades);
+    printf("- Número de reglas: %d\n", n_reglas);
+    
     return 0;
 }
