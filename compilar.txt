@@ -1,0 +1,11 @@
+flex practica.l && gcc lex.yy.c -o programa -lfl && ./programa
+
+cd /mnt/c/proyectos/"practica procesadores"/new
+
+
+
+
+
+cd para git bash 
+
+cd "/c/proyectos/practica procesadores/new"
