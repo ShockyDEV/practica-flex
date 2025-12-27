@@ -1,7 +1,21 @@
+COMPILAR Y ESCRIBIR por pantalla (ejemplo inicial)
 flex practica.l && gcc lex.yy.c -o programa -lfl && ./programa
 
-cd /mnt/c/proyectos/"practica procesadores"/new
 
+COMPILAR
+
+flex practica.l && gcc lex.yy.c -o programa -lfl
+
+
+pasamos el archivo:
+
+./programa ejemplosP1_2C/eje1b.css
+
+
+
+cd para el ubuntu
+
+cd /mnt/c/proyectos/"practica procesadores"/new
 
 
 
