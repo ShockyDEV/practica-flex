@@ -10,7 +10,11 @@ flex practica.l && gcc lex.yy.c -o programa -lfl
 pasamos el archivo:
 
 ./programa ejemplosP1_2C/eje1b.css
-
+./programa ejemplosP1_2C/eje2b.css
+./programa ejemplosP1_2C/eje3.css
+./programa ejemplosP1_2C/eje4.css
+./programa ejemplosP1_2C/eje5.css
+./programa ejemplosP1_2C/eje6.css
 
 
 cd para el ubuntu
