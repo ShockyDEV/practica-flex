@@ -1,23 +1,24 @@
 %{
 #include <stdio.h>
 
-/* Variables globales */
+/* Variables globales basadas en eje03parts.l */
 int n_media = 0;        
-int n_propiedades = 0; 
+int n_propiedades = 0;  
 int n_reglas = 0;       
 int n_important = 0;    
 int n_medidas = 0;
 int n_colores = 0;
+int colores_regla_actual = 0;
+int max_colores_regla = 0;
 %}
 
 %option noyywrap
 
-/* estado para comentarios y para las reglas*/
+/* estado para comentarios y para las reglas */
 %x COM REGLA
 
 /* signo "!" seguido opcionalmente de espacios y la palabra important) */
 important   "!"[ \t\n\r]*"important"
-
 
 /* Una propiedad es una palabra (letras y guiones) seguida de ":" */
 propiedad   [a-zA-Z\-]+[ \t]*:
@@ -39,34 +40,40 @@ colorRGB      rgba?\({valor},[ \t]*{valor},[ \t]*{valor}(,[ \t]*{alpha})?\)
 /* Formato nombre para colores */
 colornombre      (black|gray|silver|white|maroon|red|purple|fuchsia|green|lime|olive|yellow|navy|blue|teal|aqua|orange)
 
-/* en las reglas agrupamos los formatos de color en una sola acción */
-
 %%
 
 "/*"            { BEGIN(COM); }
 <COM>.|\n       { ; }
 <COM>"*/"       { BEGIN(INITIAL); }
 
-
 \"[^\"]*\"      { ; }
 \'[^\']*\'      { ; }
 
-
 "@media"        { n_media++; }
 
-
-"{"             { n_reglas++; BEGIN(REGLA); }
-
+"{"             { 
+    n_reglas++; 
+    colores_regla_actual = 0; 
+    BEGIN(REGLA); 
+}
 
 <REGLA>{important} { n_important++; }
 <REGLA>{medida}    { n_medidas++; }
 
-
-<REGLA>({colorHEX}|{colorRGB}|{colornombre}) { n_colores++; }
+<REGLA>({colorHEX}|{colorRGB}|{colornombre}) { 
+    n_colores++; 
+    colores_regla_actual++;
+}
 
 <REGLA>{propiedad} { n_propiedades++; }
 
-<REGLA>"}"         { BEGIN(INITIAL); }
+<REGLA>"}"         { 
+    /* al salir de la regla, reviso si es el nuevo máximo */
+    if (colores_regla_actual > max_colores_regla) {
+        max_colores_regla = colores_regla_actual;
+    }
+    BEGIN(INITIAL); 
+}
 
 <REGLA>.|\n        { ; }
 .|\n               { ; }
@@ -91,6 +98,7 @@ int main(int argc, char **argv)
     printf("- Número de propiedades !important: %d\n", n_important);
     printf("- Número de valores de medida: %d\n", n_medidas);
     printf("- Número de especificaciones de color: %d\n", n_colores);
+    printf("- Máximo número de colores en una sola regla: %d\n", max_colores_regla);
     
     return 0;
 }

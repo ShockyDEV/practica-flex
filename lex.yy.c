@@ -590,15 +590,17 @@ char *yytext;
 #line 2 "practica.l"
 #include <stdio.h>
 
-/* Variables globales */
+/* Variables globales basadas en eje03parts.l */
 int n_media = 0;        
-int n_propiedades = 0; 
+int n_propiedades = 0;  
 int n_reglas = 0;       
 int n_important = 0;    
 int n_medidas = 0;
 int n_colores = 0;
-#line 601 "lex.yy.c"
-/* estado para comentarios y para las reglas*/
+int colores_regla_actual = 0;
+int max_colores_regla = 0;
+#line 603 "lex.yy.c"
+/* estado para comentarios y para las reglas */
 
 /* signo "!" seguido opcionalmente de espacios y la palabra important) */
 /* Una propiedad es una palabra (letras y guiones) seguida de ":" */
@@ -606,8 +608,7 @@ int n_colores = 0;
 /* Formato HEX para colores, #3, #6 o #8 dígitos */
 /* Formato RGB/RGBA: componentes como valor (0-255) o porcentaje y transparencia */
 /* Formato nombre para colores */
-/* en las reglas agrupamos los formatos de color en una sola acción */
-#line 611 "lex.yy.c"
+#line 612 "lex.yy.c"
 
 #define INITIAL 0
 #define COM 1
@@ -826,10 +827,10 @@ YY_DECL
 		}
 
 	{
-#line 44 "practica.l"
+#line 43 "practica.l"
 
 
-#line 833 "lex.yy.c"
+#line 834 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -888,86 +889,99 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 46 "practica.l"
+#line 45 "practica.l"
 { BEGIN(COM); }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 47 "practica.l"
+#line 46 "practica.l"
 { ; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 48 "practica.l"
+#line 47 "practica.l"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 51 "practica.l"
+#line 49 "practica.l"
 { ; }
 	YY_BREAK
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 52 "practica.l"
+#line 50 "practica.l"
 { ; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 55 "practica.l"
+#line 52 "practica.l"
 { n_media++; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 58 "practica.l"
-{ n_reglas++; BEGIN(REGLA); }
+#line 54 "practica.l"
+{ 
+    n_reglas++; 
+    colores_regla_actual = 0; /* Reiniciamos para la nueva regla */
+    BEGIN(REGLA); 
+}
 	YY_BREAK
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 61 "practica.l"
+#line 60 "practica.l"
 { n_important++; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 62 "practica.l"
+#line 61 "practica.l"
 { n_medidas++; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 65 "practica.l"
-{ n_colores++; }
+#line 63 "practica.l"
+{ 
+    n_colores++; 
+    colores_regla_actual++; /* Sumamos al contador de la regla actual */
+}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 67 "practica.l"
+#line 68 "practica.l"
 { n_propiedades++; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 69 "practica.l"
-{ BEGIN(INITIAL); }
+#line 70 "practica.l"
+{ 
+    /* Antes de salir de la regla, comprobamos si es el nuevo máximo */
+    if (colores_regla_actual > max_colores_regla) {
+        max_colores_regla = colores_regla_actual;
+    }
+    BEGIN(INITIAL); 
+}
 	YY_BREAK
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 71 "practica.l"
+#line 78 "practica.l"
 { ; }
 	YY_BREAK
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 72 "practica.l"
+#line 79 "practica.l"
 { ; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 74 "practica.l"
+#line 81 "practica.l"
 ECHO;
 	YY_BREAK
-#line 971 "lex.yy.c"
+#line 985 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COM):
 case YY_STATE_EOF(REGLA):
@@ -1974,7 +1988,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 74 "practica.l"
+#line 81 "practica.l"
 
 
 /* main para pasar el CSS por consola y printear resultados por pantalla */
@@ -1995,6 +2009,7 @@ int main(int argc, char **argv)
     printf("- Número de propiedades !important: %d\n", n_important);
     printf("- Número de valores de medida: %d\n", n_medidas);
     printf("- Número de especificaciones de color: %d\n", n_colores);
+    printf("- Máximo número de colores en una sola regla: %d\n", max_colores_regla);
     
     return 0;
 }
