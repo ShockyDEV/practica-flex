@@ -7,7 +7,7 @@ int n_propiedades = 0;
 int n_reglas = 0;       
 int n_important = 0;    
 int n_medidas = 0;
-int n_colores = 0; /* Punto 6: Contador de colores */
+int n_colores = 0;
 %}
 
 %option noyywrap
@@ -27,9 +27,19 @@ num         [0-9]*\.?[0-9]+
 unidades    (pt|mm|cm|pc|in|px|em|ex)
 medida      {num}{unidades}
 
-/* formato HEX para colores */
+/* Formato HEX para colores, #3, #6 o #8 dígitos */
 hex         [0-9a-fA-F]
-colHEX      #({hex}{3}|{hex}{6}|{hex}{8})
+colorHEX      #({hex}{3}|{hex}{6}|{hex}{8})
+
+/* Formato RGB/RGBA: componentes como valor (0-255) o porcentaje y transparencia */
+valor       ([0-9]+%|[0-9]+)
+alpha       (\.[0-9]+|[0-9]*\.[0-9]+|[0-9]+)
+colorRGB      rgba?\({valor},[ \t]*{valor},[ \t]*{valor}(,[ \t]*{alpha})?\)
+
+/* Formato nombre para colores */
+colornombre      (black|gray|silver|white|maroon|red|purple|fuchsia|green|lime|olive|yellow|navy|blue|teal|aqua|orange)
+
+/* en las reglas agrupamos los formatos de color en una sola acción */
 
 %%
 
@@ -50,7 +60,10 @@ colHEX      #({hex}{3}|{hex}{6}|{hex}{8})
 
 <REGLA>{important} { n_important++; }
 <REGLA>{medida}    { n_medidas++; }
-<REGLA>{colHEX}    { n_colores++; }
+
+
+<REGLA>({colorHEX}|{colorRGB}|{colornombre}) { n_colores++; }
+
 <REGLA>{propiedad} { n_propiedades++; }
 
 <REGLA>"}"         { BEGIN(INITIAL); }
